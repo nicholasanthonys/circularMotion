@@ -63,8 +63,8 @@ function Particle(x, y, radius, color) {
         const lastPoint = { x: this.x, y: this.y };
         //move points over time
         this.radians += this.velocity;
-        this.x = x + Math.cos(this.radians) * this.distanceFromCenter;
-        this.y = y + Math.sin(this.radians) * this.distanceFromCenter;
+        this.x = mouse.x + Math.cos(this.radians) * this.distanceFromCenter;
+        this.y = mouse.y + Math.sin(this.radians) * this.distanceFromCenter;
         this.draw(lastPoint);
     }
 
