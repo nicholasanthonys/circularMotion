@@ -57,14 +57,24 @@ function Particle(x, y, radius, color) {
     //spawn circle any positin inside the circluar path
     this.radians = Math.random() * Math.PI * 2;
     this.velocity = 0.05;
-
+    this.lastMouse = {
+        x: x,
+        y: y
+    }
 
     this.update = () => {
         const lastPoint = { x: this.x, y: this.y };
+
         //move points over time
         this.radians += this.velocity;
-        this.x = mouse.x + Math.cos(this.radians) * this.distanceFromCenter;
-        this.y = mouse.y + Math.sin(this.radians) * this.distanceFromCenter;
+
+        //drag effect
+        this.lastMouse.x += (mouse.x - this.lastMouse.x) * 0.05;
+        this.lastMouse.y += (mouse.y - this.lastMouse.y) * 0.05;
+
+        //circular motion
+        this.x = this.lastMouse.x + Math.cos(this.radians) * this.distanceFromCenter;
+        this.y = this.lastMouse.y + Math.sin(this.radians) * this.distanceFromCenter;
         this.draw(lastPoint);
     }
 
