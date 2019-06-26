@@ -1,4 +1,4 @@
-import utils from './utils'
+
 
 const canvas = document.querySelector('canvas')
 const c = canvas.getContext('2d')
@@ -11,7 +11,7 @@ const mouse = {
     y: innerHeight / 2
 }
 
-const colors = ['#2185C5', '#7ECEFD', '#FFF6E5', '#FF7F66']
+const colors = ['#00bdff', '#4d39ce', '#088eff']
 
 // Event Listeners
 addEventListener('mousemove', event => {
@@ -26,15 +26,62 @@ addEventListener('resize', () => {
     init()
 })
 
-// Objects
-function Object(x, y, radius, color) {
-    this.x = x
-    this.y = y
-    this.radius = radius
-    this.color = color
+//utility function
+
+function randomIntFromRange(min, max) {
+    return Math.floor(Math.random() * (max - min + 1) + min)
 }
 
-Object.prototype.draw = function() {
+function randomColor(colors) {
+    return colors[Math.floor(Math.random() * colors.length)]
+}
+
+function distance(x1, y1, x2, y2) {
+    const xDist = x2 - x1
+    const yDist = y2 - y1
+
+    return Math.sqrt(Math.pow(xDist, 2) + Math.pow(yDist, 2))
+}
+
+
+
+
+// Objects
+function Particle(x, y, radius, color) {
+    this.x = x;
+    this.y = y;
+    this.radius = radius;
+    this.color = color;
+    this.distanceFromCenter = randomIntFromRange(50, 120);
+
+    //spawn circle any positin inside the circluar path
+    this.radians = Math.random() * Math.PI * 2;
+    this.velocity = 0.05;
+
+
+    this.update = () => {
+        const lastPoint = { x: this.x, y: this.y };
+        //move points over time
+        this.radians += this.velocity;
+        this.x = x + Math.cos(this.radians) * this.distanceFromCenter;
+        this.y = y + Math.sin(this.radians) * this.distanceFromCenter;
+        this.draw(lastPoint);
+    }
+
+    this.draw = lastPoint => {
+        c.beginPath();
+        c.strokeStyle = this.color;
+        c.lineWidth = this.radius;
+        c.moveTo(lastPoint.x, lastPoint.y);
+        c.lineTo(this.x, this.y);
+        c.stroke();
+        c.closePath();
+
+    }
+
+}
+
+Object.prototype.draw = function () {
     c.beginPath()
     c.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false)
     c.fillStyle = this.color
@@ -42,29 +89,33 @@ Object.prototype.draw = function() {
     c.closePath()
 }
 
-Object.prototype.update = function() {
+Object.prototype.update = function () {
     this.draw()
 }
 
 // Implementation
-let objects
+let particles;
 function init() {
-    objects = []
+    particles = []
 
-    for (let i = 0; i < 400; i++) {
-        // objects.push()
+    for (let i = 0; i < 50; i++) {
+        const radius = (Math.random() * 2) + 1;
+        particles.push(new Particle(canvas.width / 2, canvas.height / 2, radius, randomColor(colors)));
     }
+
+    console.log(particles);
 }
 
 // Animation Loop
 function animate() {
     requestAnimationFrame(animate)
-    c.clearRect(0, 0, canvas.width, canvas.height)
+    c.fillStyle = "rgba(255,255,255,0.05)";
+    c.fillRect(0, 0, canvas.width, canvas.height)
 
-    c.fillText('HTML CANVAS BOILERPLATE', mouse.x, mouse.y)
-    // objects.forEach(object => {
-    //  object.update()
-    // })
+    //animate multiple object at once
+    particles.forEach(particle => {
+        particle.update()
+    })
 }
 
 init()
